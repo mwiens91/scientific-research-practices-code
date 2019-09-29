@@ -69,3 +69,7 @@ beta | type II error rate | 0 <= beta <= 1
 c_n_neg | probability that a negative novel result is published | 0 <= c_n_neg <= 1
 c_r_pos | probability that a positive replication result is published | 0 <= c_r_pos <= 1
 c_r_neg | probability that a negative replication result is published | 0 <= c_r_neg <= 1
+
+## Running the model
+
+Run the Jupyter notebook [here](core-science-notebook.ipynb).
