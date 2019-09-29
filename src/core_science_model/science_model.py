@@ -8,9 +8,9 @@ POSITIVE = "positive"
 NEGATIVE = "negative"
 
 # Constant for hypotheses
-TRUTH = "truth"
+TRUE = "true"
 TALLY = "tally"
-TESTED_HYPOTHESIS_SCHEMA = Schema({TRUTH: bool, TALLY: int})
+TESTED_HYPOTHESIS_SCHEMA = Schema({TRUE: bool, TALLY: int})
 
 
 class ScienceAgent(Agent):
@@ -79,7 +79,7 @@ class ScienceAgent(Agent):
 
         # Publish the result
         if will_publish:
-            self.staged_hypothesis = {TRUTH: is_true, TALLY: 1}
+            self.staged_hypothesis = {TRUE: is_true, TALLY: 1}
 
     def replication_action(self) -> None:
         """Conduct a replication."""
@@ -89,7 +89,7 @@ class ScienceAgent(Agent):
         hypothesis = self.random.choice(self.model.tested_hypotheses)
 
         # Determine the result of the experiment
-        if hypothesis[TRUTH]:
+        if hypothesis[TRUE]:
             is_positive = self.random.choices(
                 population=[True, False],
                 weights=[1 - self.model.beta, self.model.beta],
