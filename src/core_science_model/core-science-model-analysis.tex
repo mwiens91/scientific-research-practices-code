@@ -70,36 +70,44 @@ this approach is valid in the limit that there are far more tested
 hypotheses than agents, which is precisely what we are considering when
 analysing the model's long term behaviour.
 
-Proceeding, we have the following recurrence relation:
+Moving forward, we have the following recurrence relation:
+
+For $s = 1$:
 %
-\begin{equation*}
-    n^\prime_{\tT, s} =
-        \begin{dcases}
-            n_{\tT, 1}
-            + a n r \del{
+\begin{align*}
+    n^\prime_{\tT, 1}
+        = &n_{\tT, 1} \\
+          &+ a n r \del{
                 - f_{\tT, 1} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}
                 + f_{\tT, 0} \del{1 - \beta} c_{R +}
                 + f_{\tT, 2} \beta c_{R -}
-            }
-            + a n \del{1 - r} b \beta c_{N -}
-            , &s = 1 \\
-            n_{\tT, -1}
-            + a n r \del{
-                - f_{\tT, -1} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}
-                + f_{\tT, -2} \del{1 - \beta} c_{R +}
-                + f_{\tT, 0} \beta c_{R -}
-            }
-            + a n \del{1 - r} b \del{1 - \beta}
-            , &s = -1 \\
-            n_{\tT, s}
-            + a n r \del{
-                - f_{\tT, s} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}
-                + f_{\tT, s - 1} \del{1 - \beta} c_{R +}
-                + f_{\tT, s + 1} \beta c_{R -}
-            }
-            , &\text{otherwise}
-        \end{dcases}
-\end{equation*}
-
+          } \\
+          &+ a n \del{1 - r} b \beta c_{N -}
+\end{align*}
+%
+For $s = - 1$:
+%
+\begin{align*}
+    n^\prime_{\tT, 1}
+        = &n_{\tT, -1} \\
+          &+ a n r \del{
+            - f_{\tT, -1} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}
+            + f_{\tT, -2} \del{1 - \beta} c_{R +}
+            + f_{\tT, 0} \beta c_{R -}
+          } \\
+          &+ a n \del{1 - r} b \del{1 - \beta}
+\end{align*}
+%
+For $s \notin \cbr{1, -1}$:
+%
+\begin{align*}
+    n^\prime_{\tT, 1}
+        = &n_{\tT, s} \\
+          &+ a n r \del{
+              - f_{\tT, s} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}
+              + f_{\tT, s - 1} \del{1 - \beta} c_{R +}
+              + f_{\tT, s + 1} \beta c_{R -}
+          }
+\end{align*}
 
 \end{document}
