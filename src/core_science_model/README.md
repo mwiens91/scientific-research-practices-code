@@ -16,10 +16,10 @@ Within the field we have a number of **tested hypotheses**, which are
 published results from agents that have investigated **novel
 hypotheses**. Each tested hypothesis has a **tally**. When a novel
 result is published, its corresponding "tested hypothesis" starts at a
-tally of 1. When agents attempt to replicate a tested hypothesis and
-publish their results, they add 1 to its tally if their replication
-attempt was successful or subtract 1 from its tally if their replication
-attempt was unsuccessful.
+tally of 1 if the result was positive and -1 if the result was negative.
+When agents attempt to **replicate** a tested hypothesis and publish
+their results, they add 1 to its tally if the result was positive or
+subtract 1 from its tally if the result was negative.
 
 The model starts with one or more hypotheses with corresponding tallies
 and proceeds in discrete time steps. Each time step, every agent

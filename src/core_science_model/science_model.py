@@ -79,7 +79,10 @@ class ScienceAgent(Agent):
 
         # Publish the result
         if will_publish:
-            self.staged_hypothesis = {TRUE: is_true, TALLY: 1}
+            self.staged_hypothesis = {
+                TRUE: is_true,
+                TALLY: 1 if result == POSITIVE else -1,
+            }
 
     def replication_action(self) -> None:
         """Conduct a replication."""
