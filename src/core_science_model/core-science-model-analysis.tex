@@ -1,0 +1,105 @@
+% Set up the document
+\documentclass{article}
+
+% Page size
+\usepackage[
+    letterpaper,]{geometry}
+
+% Lines between paragraphs
+\setlength{\parskip}{\baselineskip}
+\setlength{\parindent}{0pt}
+
+% Math
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{commath}
+
+% Math shortcuts
+\newcommand{\tT}{\text{T}}
+
+% Links
+\usepackage{hyperref}
+
+\begin{document}
+
+We will be primarily interested in determining $\hat{p}_{\tT,s}$, which
+we define as the \textit{steady state} proportion of hypotheses with
+tally $s$ that are true.
+
+Let $A$ be the number of agents in the model, and let
+$n_t, n_{t, \tT, s}$ denote the total number of hypotheses and the
+number of true hypotheses with tally $s$, respectively, during the
+$t$-th iteration of the model. To simplify notation we fix a time step
+$t$ and suppress the $t$ subscripts by defining, for any variable $x_t$,
+%
+\begin{align*}
+    x &\coloneqq x_t \\
+    x^\prime &\coloneqq x_{t + 1}
+\end{align*}
+%
+Define $$f_{\tT, s} \coloneqq \frac{n_{\tT, s}}{n}$$ $$a \coloneqq \frac{A}{n}$$
+where $f_{\tT, s}$ is the frequency of true hypotheses with tally $s$
+and $a$ is the number of agents in proportion to the number of
+hypotheses.
+
+Fixing any $s$, we have the following contributions to the total number
+of true hypotheses with this tally after each time step:
+
+\begin{itemize}
+    \item hypotheses with tally $s - 1$ that were successfully
+        replicated:
+        $$a n r f_{\tT, s - 1} \del{1 - \beta} c_{R +}$$
+    \item hypotheses with tally $s + 1$ that failed to replicated:
+        $$a n r f_{\tT, s + 1} \beta c_{R -}$$
+    \item if $s = 1$, new hypothesis with positive results that were
+        published:
+        $$a n \del{1 - r} b \del{1 - \beta}$$
+    \item if $s = -1$, new hypothesis with negative results that were
+        published:
+        $$a n \del{1 - r} b \beta c_{N -}$$
+\end{itemize}
+
+However, we also need to subtract the number of hypotheses with tally
+$s$ that underwent a replication attempt:
+$$a n r f_{\tT, s} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}$$
+
+Note that, to simplify the analysis, we are assuming that during any
+given time step there is \textit{at most} one replication attempt per
+tested hypothesis. While there are no such restrictions in the model,
+this approach is valid in the limit that there are far more tested
+hypotheses than agents, which is precisely what we are considering when
+analysing the model's long term behaviour.
+
+Proceeding, we have the following recurrence relation:
+%
+\begin{equation*}
+    n^\prime_{\tT, s} =
+        \begin{dcases}
+            n_{\tT, 1}
+            + a n r \del{
+                - f_{\tT, 1} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}
+                + f_{\tT, 0} \del{1 - \beta} c_{R +}
+                + f_{\tT, 2} \beta c_{R -}
+            }
+            + a n \del{1 - r} b \beta c_{N -}
+            , &s = 1 \\
+            n_{\tT, -1}
+            + a n r \del{
+                - f_{\tT, -1} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}
+                + f_{\tT, -2} \del{1 - \beta} c_{R +}
+                + f_{\tT, 0} \beta c_{R -}
+            }
+            + a n \del{1 - r} b \del{1 - \beta}
+            , &s = -1 \\
+            n_{\tT, s}
+            + a n r \del{
+                - f_{\tT, s} \del{\del{1 - \beta} c_{R +} + \beta c_{R -}}
+                + f_{\tT, s - 1} \del{1 - \beta} c_{R +}
+                + f_{\tT, s + 1} \beta c_{R -}
+            }
+            , &\text{otherwise}
+        \end{dcases}
+\end{equation*}
+
+
+\end{document}
