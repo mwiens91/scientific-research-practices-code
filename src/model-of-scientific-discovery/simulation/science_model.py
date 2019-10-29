@@ -70,7 +70,10 @@ class ScienceAgent(Agent):
 
         # Determine whether to publish the experiment
         if result == POSITIVE:
-            will_publish = True
+            will_publish = self.random.choices(
+                population=[True, False],
+                weights=[self.model.c_n_pos, 1 - self.model.c_n_pos],
+            )[0]
         else:
             will_publish = self.random.choices(
                 population=[True, False],
@@ -89,7 +92,7 @@ class ScienceAgent(Agent):
         # Pick a hypothesis to replicate. Note that any changes to the
         # hypothesis will be made in place in the list of hypothesis in
         # the model.
-        hypothesis = self.random.choice(self.model.tested_hypotheses)
+        hypothesis = self.random.choice(self.model.published_hypotheses)
 
         # Determine the result of the experiment
         if hypothesis[TRUE]:
@@ -132,13 +135,16 @@ class ScienceModel(Model):
         b: The probability that a novel hypothesis is true.
         alpha: Type I error rate.
         beta: Type II error rate.
+        c_n_pos: The probability that a positive novel result is
+            published.
         c_n_neg: The probability that a negative novel result is
             published.
         c_r_pos: The probability that a positive replication result is
             published.
         c_r_neg: The probability that a negative replication result is
             published.
-        initial_data: A list of tested hypotheses to start the data with.
+        initial_data: A list of published hypotheses to start the data
+            with.
         scheduler: A scheduler instance that determines in which order
             agents act.
     """
@@ -150,6 +156,7 @@ class ScienceModel(Model):
         b: float,
         alpha: float,
         beta: float,
+        c_n_pos: float,
         c_n_neg: float,
         c_r_pos: float,
         c_r_neg: float,
@@ -159,7 +166,7 @@ class ScienceModel(Model):
         """Initializes a model."""
         # Model parameters. Validate that probabilities are satisfied
         # and then assign.
-        for p in (r, b, alpha, beta, c_n_neg, c_r_pos, c_r_neg):
+        for p in (r, b, alpha, beta, c_n_pos, c_n_neg, c_r_pos, c_r_neg):
             Schema(lambda x: 0 < x < 1).validate(p)
 
         self.n = n
@@ -167,6 +174,7 @@ class ScienceModel(Model):
         self.b = b
         self.alpha = alpha
         self.beta = beta
+        self.c_n_pos = c_n_pos
         self.c_n_neg = c_n_neg
         self.c_r_pos = c_r_pos
         self.c_r_neg = c_r_neg
@@ -174,11 +182,11 @@ class ScienceModel(Model):
         # Model scheduler
         self.scheduler = scheduler(self)
 
-        # Validate initial tested hypothesis data and store it
+        # Validate initial published hypothesis data and store it
         for hypothesis in initial_data:
             TESTED_HYPOTHESIS_SCHEMA.validate(hypothesis)
 
-        self.tested_hypotheses = initial_data
+        self.published_hypotheses = initial_data
 
         # Initialize agents
         for i in range(self.n):
@@ -198,4 +206,4 @@ class ScienceModel(Model):
             ]
             if hypothesis is not None
         ]
-        self.tested_hypotheses += new_hypotheses
+        self.published_hypotheses += new_hypotheses
