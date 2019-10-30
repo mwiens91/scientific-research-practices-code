@@ -7,7 +7,7 @@ McElreath R, Smaldino PE (2015) Replication, Communication, and the Population D
 
 ## How the model works
 
-The model has `n` researchers/research groups (or other appropriate
+The model has `A` researchers/research groups (or other appropriate
 organizational unit) that conduct and publish research within some
 scientific field. We will refer to these researchers/research groups as
 **agents** and the scientific field as the **field**.
@@ -61,7 +61,7 @@ tallies), we have a number of parameters, described as follows:
 
 parameter | description | constraints
 --------- | ----------- | -----------
-n | number of agents | integral, n > 0
+A | number of agents | integral, A > 0
 r | probability that an agent chooses to replicate a published hypothesis | 0 <= r <= 1
 b | probability that a novel hypothesis is true | 0 <= b <= 1
 alpha | type I error rate | 0 <= alpha <= 1
