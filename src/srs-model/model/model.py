@@ -422,7 +422,7 @@ class SrsModel(Model):
 
         for investigation in self.published_investigations:
             # Unpack the investigation
-            investigation_author = investigation[INVESTIGATION_AUTHOR]
+            investigation_author_id = investigation[INVESTIGATION_AUTHOR]
             investigation_result = investigation[INVESTIGATION_RESULT]
             investigation_truth = investigation[INVESTIGATION_TRUTH]
             investigation_type = investigation[INVESTIGATION_TYPE]
@@ -464,25 +464,29 @@ class SrsModel(Model):
                     v_0 = self.v_0_R_neg
 
                 self.agent_map[
-                    investigation_author
+                    investigation_author_id
                 ].w += life_cycle_helpers.v_R(
                     v_0, self.eta_r, target_hypothesis[HYPOTHESIS_TALLY]
                 )
-                self.agent_map[target_hypothesis[HYPOTHESIS_AUTHOR]].w += v_RX
+
+                hypothesis_author_id = target_hypothesis[HYPOTHESIS_AUTHOR]
+
+                if hypothesis_author_id in self.agent_map:
+                    self.agent_map[hypothesis_author_id].w += v_RX
             else:
                 # Handle novel investigations. First we add the
                 # investigation to the list of published hypotheses.
                 self.hypothesis_manager.add_hypothesis(
                     investigation_result,
                     investigation_truth,
-                    investigation_author,
+                    investigation_author_id,
                 )
 
                 # Assign payoff
                 if investigation_result == RESULT_POSITIVE:
-                    self.agent_map[investigation_author].w += self.v_N_pos
+                    self.agent_map[investigation_author_id].w += self.v_N_pos
                 else:
-                    self.agent_map[investigation_author].w += self.v_N_neg
+                    self.agent_map[investigation_author_id].w += self.v_N_neg
 
         # Now change tallies of hypotheses
         for hyp_idx, ds in tally_change_map.items():
