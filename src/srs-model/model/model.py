@@ -488,6 +488,9 @@ class SrsModel(Model):
         for hyp_idx, ds in tally_change_map.items():
             self.hypothesis_manager.hypotheses[hyp_idx][HYPOTHESIS_TALLY] += ds
 
+        # Clear the published investigations list for the next time step
+        self.published_investigations = []
+
         # Perform the Expansion stage
 
         # Perform the Retirement stage
