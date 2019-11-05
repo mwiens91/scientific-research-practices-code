@@ -64,7 +64,7 @@ class HypothesisManager:
 
             # Mark this hypothesis in the map
             if s in self.hypothesis_map:
-                self.hypothesis_map.append(idx)
+                self.hypothesis_map[s].append(idx)
             else:
                 self.hypothesis_map[s] = [idx]
 
