@@ -3,12 +3,13 @@
 from typing import Optional
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler, RandomActivation
-import life_cycle_helpers
+from . import life_cycle_helpers
 from .constants import (
     HYPOTHESIS_AUTHOR,
     HYPOTHESIS_INITIAL_OUTCOME,
     HYPOTHESIS_TALLY,
     HYPOTHESIS_TRUTH,
+    INVESTIGATION_AUTHOR,
     INVESTIGATION_NOVEL,
     INVESTIGATION_REPLICATION,
     INVESTIGATION_RESULT,
@@ -152,12 +153,13 @@ class Agent(MesaAgent):
                 )[0]
 
             # Communication Decision
-            if investigation_type == INVESTIGATION_NOVEL:
-                investigation_to_stage = {
-                    INVESTIGATION_TYPE: INVESTIGATION_NOVEL,
-                    INVESTIGATION_RESULT: investigation_result,
-                }
+            investigation_to_stage = {
+                INVESTIGATION_TYPE: investigation_type,
+                INVESTIGATION_AUTHOR: self.unique_id,
+                INVESTIGATION_RESULT: investigation_result,
+            }
 
+            if investigation_type == INVESTIGATION_NOVEL:
                 if investigation_result == RESULT_POSITIVE:
                     will_stage = self.random.choices(
                         population=[True, False],
@@ -172,11 +174,9 @@ class Agent(MesaAgent):
                 if will_stage:
                     self.staged_investigation = investigation_to_stage
             else:
-                investigation_to_stage = {
-                    INVESTIGATION_TYPE: INVESTIGATION_REPLICATION,
-                    INVESTIGATION_RESULT: investigation_result,
-                    INVESTIGATION_TARGET_HYPOTHESIS: target_hypothesis_idx,
-                }
+                investigation_to_stage[
+                    INVESTIGATION_TARGET_HYPOTHESIS
+                ] = target_hypothesis_idx
 
                 if investigation_result == RESULT_POSITIVE:
                     will_stage = self.random.choices(
@@ -225,7 +225,9 @@ class Agent(MesaAgent):
             )[0]
 
             if will_publish:
-                self.published_investigations.append(self.staged_investigation)
+                self.model.published_investigations.append(
+                    self.staged_investigation
+                )
 
             # Unstage the investigation
             self.staged_investigation = None
