@@ -14,6 +14,7 @@ from .constants import (
     INVESTIGATION_REPLICATION,
     INVESTIGATION_RESULT,
     INVESTIGATION_TARGET_HYPOTHESIS,
+    INVESTIGATION_TRUTH,
     INVESTIGATION_TYPE,
     RESULT_NEGATIVE,
     RESULT_POSITIVE,
@@ -127,7 +128,7 @@ class Agent(MesaAgent):
                 )
 
                 # Record truth of hypothesis
-                hypothesis_truth = self.model.hypotheses[
+                hypothesis_truth = self.model.hypothesis_manager.hypotheses[
                     target_hypothesis_idx
                 ][HYPOTHESIS_TRUTH]
             else:
@@ -155,6 +156,7 @@ class Agent(MesaAgent):
             # Communication Decision
             investigation_to_stage = {
                 INVESTIGATION_TYPE: investigation_type,
+                INVESTIGATION_TRUTH: hypothesis_truth,
                 INVESTIGATION_AUTHOR: self.unique_id,
                 INVESTIGATION_RESULT: investigation_result,
             }
@@ -192,17 +194,12 @@ class Agent(MesaAgent):
                 if will_stage:
                     self.staged_investigation = investigation_to_stage
         else:
-            # Communication. First unpack the investigation which is
-            # staged.
+            # Communication. First unpack a few attributes of the
+            # investigation which is staged.
             investigation_type = self.staged_investigation[INVESTIGATION_TYPE]
             investigation_result = self.staged_investigation[
                 INVESTIGATION_RESULT
             ]
-
-            if investigation_type == INVESTIGATION_REPLICATION:
-                target_hypothesis_idx = self.staged_investigation[
-                    INVESTIGATION_TARGET_HYPOTHESIS
-                ]
 
             # Determine the probability that this investigation will be
             # published
@@ -414,10 +411,82 @@ class SrsModel(Model):
 
     def step(self) -> None:
         """Iterate through all agent actions for one time step."""
+        # Pre-process a map of hypotheses grouped by tallies
+        self.hypothesis_manager.compute_hypothesis_map()
+
         # Perform the Science stage
         self.scheduler.step()
 
         # Handle newly published investigations and payoffs
+        tally_change_map = {}
+
+        for investigation in self.published_investigations:
+            # Unpack the investigation
+            investigation_author = investigation[INVESTIGATION_AUTHOR]
+            investigation_result = investigation[INVESTIGATION_RESULT]
+            investigation_truth = investigation[INVESTIGATION_TRUTH]
+            investigation_type = investigation[INVESTIGATION_TYPE]
+
+            if investigation_type == INVESTIGATION_REPLICATION:
+                # Handle replication investigations
+                target_hypothesis_idx = investigation[
+                    INVESTIGATION_TARGET_HYPOTHESIS
+                ]
+                target_hypothesis = self.hypothesis_manager.hypotheses[
+                    target_hypothesis_idx
+                ]
+
+                # Determine whether the investigation was consistent
+                # with the original investigation outcome of the
+                # hypothesis. Here we assign the tally change and payoff
+                # variables relevant to this result.
+                if (
+                    investigation_result
+                    == target_hypothesis[HYPOTHESIS_INITIAL_OUTCOME]
+                ):
+                    ds = 1
+                    v_RX = self.v_RS
+                else:
+                    ds = -1
+                    v_RX = self.v_RF
+
+                # Keep track of which tallies we need to change, which
+                # we will do after assigning payoffs
+                if target_hypothesis_idx in tally_change_map:
+                    tally_change_map[target_hypothesis_idx] += ds
+                else:
+                    tally_change_map[target_hypothesis_idx] = ds
+
+                # Now assign payoffs
+                if investigation_result == RESULT_POSITIVE:
+                    v_0 = self.v_0_R_pos
+                else:
+                    v_0 = self.v_0_R_neg
+
+                self.agent_map[
+                    investigation_author
+                ].w += life_cycle_helpers.v_R(
+                    v_0, self.eta_r, target_hypothesis[HYPOTHESIS_TALLY]
+                )
+                self.agent_map[target_hypothesis[HYPOTHESIS_AUTHOR]].w += v_RX
+            else:
+                # Handle novel investigations. First we add the
+                # investigation to the list of published hypotheses.
+                self.hypothesis_manager.add_hypothesis(
+                    investigation_result,
+                    investigation_truth,
+                    investigation_author,
+                )
+
+                # Assign payoff
+                if investigation_result == RESULT_POSITIVE:
+                    self.agent_map[investigation_author].w += self.v_N_pos
+                else:
+                    self.agent_map[investigation_author].w += self.v_N_neg
+
+        # Now change tallies of hypotheses
+        for hyp_idx, ds in tally_change_map.items():
+            self.hypothesis_manager.hypotheses[hyp_idx][HYPOTHESIS_TALLY] += ds
 
         # Perform the Expansion stage
 

@@ -10,30 +10,6 @@ from .constants import (
 )
 
 
-def create_hypothesis(
-    initial_outcome: str,
-    truth_value: bool,
-    author_id: Optional[int] = None,
-    tally: Optional[int] = 0,
-) -> dict:
-    """Return a hypothesis with specified attributes.
-
-    Args:
-        initial_outcome: The outcome of the initial investigation of
-            the hypothesis.
-        truth_value: The truth value of the hypothesis.
-        author_id: The ID of the agent which first
-            published an investigation of this hypthesis.
-        tally: The tally of the hypothesis
-    """
-    return {
-        HYPOTHESIS_AUTHOR: author_id,
-        HYPOTHESIS_INITIAL_OUTCOME: initial_outcome,
-        HYPOTHESIS_TALLY: tally,
-        HYPOTHESIS_TRUTH: truth_value,
-    }
-
-
 class HypothesisManager:
     """A class to manage hypotheses.
 
@@ -58,7 +34,7 @@ class HypothesisManager:
         """
         self.hypothesis_map = {}
 
-        for hyp, idx in enumerate(self.hypotheses):
+        for idx, hyp in enumerate(self.hypotheses):
             # Get the tally of the hypothesis
             s = hyp[HYPOTHESIS_TALLY]
 
@@ -67,6 +43,32 @@ class HypothesisManager:
                 self.hypothesis_map[s].append(idx)
             else:
                 self.hypothesis_map[s] = [idx]
+
+    def add_hypothesis(
+        self,
+        initial_outcome: str,
+        truth_value: bool,
+        author_id: Optional[int] = None,
+        tally: Optional[int] = 0,
+    ) -> None:
+        """Add a hypothesis to the hypothesis manager.
+
+        Args:
+            initial_outcome: The outcome of the initial investigation of
+                the hypothesis.
+            truth_value: The truth value of the hypothesis.
+            author_id: The ID of the agent which first
+                published an investigation of this hypthesis.
+            tally: The tally of the hypothesis
+        """
+        self.hypotheses.append(
+            {
+                HYPOTHESIS_AUTHOR: author_id,
+                HYPOTHESIS_INITIAL_OUTCOME: initial_outcome,
+                HYPOTHESIS_TALLY: tally,
+                HYPOTHESIS_TRUTH: truth_value,
+            }
+        )
 
     def find_hypothesis_closest_to_target_tally(
         self, s: float, agent: mesa.Agent

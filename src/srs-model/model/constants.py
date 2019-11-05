@@ -13,6 +13,7 @@ RESULT_NEGATIVE = "negative"
 # Investigation constants
 INVESTIGATION_AUTHOR = "author"
 INVESTIGATION_TYPE = "type"
+INVESTIGATION_TRUTH = "truth"
 INVESTIGATION_NOVEL = "novel"
 INVESTIGATION_REPLICATION = "replication"
 INVESTIGATION_RESULT = "result"
