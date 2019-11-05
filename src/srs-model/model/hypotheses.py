@@ -7,6 +7,7 @@ from .constants import (
     HYPOTHESIS_INITIAL_OUTCOME,
     HYPOTHESIS_TALLY,
     HYPOTHESIS_TRUTH,
+    RESULT_POSITIVE,
 )
 
 
@@ -49,7 +50,7 @@ class HypothesisManager:
         initial_outcome: str,
         truth_value: bool,
         author_id: Optional[int] = None,
-        tally: Optional[int] = 0,
+        tally: Optional[int] = None,
     ) -> None:
         """Add a hypothesis to the hypothesis manager.
 
@@ -59,8 +60,11 @@ class HypothesisManager:
             truth_value: The truth value of the hypothesis.
             author_id: The ID of the agent which first
                 published an investigation of this hypthesis.
-            tally: The tally of the hypothesis
+            tally: The tally of the hypothesis.
         """
+        if tally is None:
+            tally = 1 if initial_outcome == RESULT_POSITIVE else -1
+
         self.hypotheses.append(
             {
                 HYPOTHESIS_AUTHOR: author_id,
