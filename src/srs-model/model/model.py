@@ -3,6 +3,7 @@
 from typing import Optional
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler, RandomActivation
+import life_cycle_helpers
 from .hypotheses import create_hypothesis, HypothesisManager
 
 
@@ -61,6 +62,33 @@ class Agent(MesaAgent):
 
         # Set the staged investigation
         self.staged_investigation = None
+
+    def step(self) -> None:
+        """Perform the Science stage."""
+        # Productivity Check
+        p_s = life_cycle_helpers.p_s(self.model.eta_s, self.tau)
+
+        check_passed = self.random.choices(
+            population=[True, False], weights=[p_s, 1 - p_s]
+        )[0]
+
+        if not check_passed:
+            return
+
+        # We now branch depending on whether we have an investigation
+        # staged
+        if self.staged_investigation is None:
+            # Hypothesis Selection
+
+            # Investigation
+
+            # Communication Decision
+
+            pass
+        else:
+            # Communication
+
+            pass
 
 
 class SrsModel(Model):
@@ -238,4 +266,9 @@ class SrsModel(Model):
 
     def step(self) -> None:
         """Iterate through all agent actions for one time step."""
+        # Perform the Science stage
         self.scheduler.step()
+
+        # Perform the Expansion stage
+
+        # Perform the Retirement stage
