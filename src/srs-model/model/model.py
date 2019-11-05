@@ -43,7 +43,7 @@ class Agent(MesaAgent):
         c_R_neg: The probability that the agent chooses to publish a
             negative replication result.
         alpha: The agent's type I error.
-        beta: The agent's type I error.
+        beta: The agent's type II error.
         staged_investigation: An (optional) investigation the agent has
             staged.
     """
