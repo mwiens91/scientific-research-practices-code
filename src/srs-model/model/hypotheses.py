@@ -16,15 +16,15 @@ def create_hypothesis(
     author_id: Optional[int] = None,
     tally: Optional[int] = 0,
 ) -> dict:
-    """Return a hypothesis map with specified attributes.
+    """Return a hypothesis with specified attributes.
 
     Args:
-        truth_value: The truth value of the hypothesis.
-        tally: The tally of the hypothesis
-        author_id: The ID of the agent which first
-            published an investigation of this hypthesis.
         initial_outcome: The outcome of the initial investigation of
             the hypothesis.
+        truth_value: The truth value of the hypothesis.
+        author_id: The ID of the agent which first
+            published an investigation of this hypthesis.
+        tally: The tally of the hypothesis
     """
     return {
         HYPOTHESIS_AUTHOR: author_id,
