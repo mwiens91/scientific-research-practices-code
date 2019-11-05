@@ -152,24 +152,24 @@ class Agent(MesaAgent):
                 )[0]
 
             # Communication Decision
-            if investigation_type == INVESTIATION_NOVEL:
+            if investigation_type == INVESTIGATION_NOVEL:
                 investigation_to_stage = {
                     INVESTIGATION_TYPE: INVESTIGATION_NOVEL,
                     INVESTIGATION_RESULT: investigation_result,
                 }
 
                 if investigation_result == RESULT_POSITIVE:
-                    will_publish = self.random.choices(
+                    will_stage = self.random.choices(
                         population=[True, False],
                         weights=[self.c_N_pos, 1 - self.c_N_pos],
                     )[0]
                 else:
-                    will_publish = self.random.choices(
+                    will_stage = self.random.choices(
                         population=[True, False],
                         weights=[self.c_N_neg, 1 - self.c_N_neg],
                     )[0]
 
-                if will_publish:
+                if will_stage:
                     self.staged_investigation = investigation_to_stage
             else:
                 investigation_to_stage = {
@@ -179,22 +179,56 @@ class Agent(MesaAgent):
                 }
 
                 if investigation_result == RESULT_POSITIVE:
-                    will_publish = self.random.choices(
+                    will_stage = self.random.choices(
                         population=[True, False],
                         weights=[self.c_R_pos, 1 - self.c_R_pos],
                     )[0]
                 else:
-                    will_publish = self.random.choices(
+                    will_stage = self.random.choices(
                         population=[True, False],
                         weights=[self.c_R_neg, 1 - self.c_R_neg],
                     )[0]
 
-                if will_publish:
+                if will_stage:
                     self.staged_investigation = investigation_to_stage
         else:
-            # Communication
+            # Communication. First unpack the investigation which is
+            # staged.
+            investigation_type = self.staged_investigation[INVESTIGATION_TYPE]
+            investigation_result = self.staged_investigation[
+                INVESTIGATION_RESULT
+            ]
 
-            pass
+            if investigation_type == INVESTIGATION_REPLICATION:
+                target_hypothesis_idx = self.staged_investigation[
+                    INVESTIGATION_TARGET_HYPOTHESIS
+                ]
+
+            # Determine the probability that this investigation will be
+            # published
+            if investigation_type == INVESTIGATION_NOVEL:
+                if investigation_result == RESULT_POSITIVE:
+                    j_0 = self.model.j_0_N_pos
+                else:
+                    j_0 = self.model.j_0_N_neg
+            else:
+                if investigation_result == RESULT_POSITIVE:
+                    j_0 = self.model.j_0_R_pos
+                else:
+                    j_0 = self.model.j_0_R_neg
+
+            j = life_cycle_helpers.j(j_0, self.model.eta_j, self.w)
+
+            # Publish (or don't)
+            will_publish = self.random.choices(
+                population=[True, False], weights=[j, 1 - j]
+            )[0]
+
+            if will_publish:
+                self.published_investigations.append(self.staged_investigation)
+
+            # Unstage the investigation
+            self.staged_investigation = None
 
 
 class SrsModel(Model):
@@ -247,6 +281,8 @@ class SrsModel(Model):
         agent_map: A dictionary which has agent IDs as keys and the
             corresponding Agent instance as values.
         hypothesis_manager: An instance of the hypothesis manager class.
+        published_investigations: An array containing investigations
+            published during a time step.
         scheduler: A scheduler instance that determines in which order
             agents act.
     """
@@ -319,6 +355,10 @@ class SrsModel(Model):
         # Initialize hypothesis manager
         self.hypothesis_manager = HypothesisManager()
 
+        # Initialize array for investigations published during a time
+        # step
+        self.published_investigations = []
+
     def initialize_agents(
         self,
         gamma: float,
@@ -374,6 +414,8 @@ class SrsModel(Model):
         """Iterate through all agent actions for one time step."""
         # Perform the Science stage
         self.scheduler.step()
+
+        # Handle newly published investigations and payoffs
 
         # Perform the Expansion stage
 
