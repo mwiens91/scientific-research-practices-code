@@ -121,7 +121,7 @@ class Agent(MesaAgent):
                 target_tally = self.random.gauss(0, self.model.sigma_t)
 
                 # Select a random hypothesis closest to this tally
-                target_hypothesis_idx = self.model.find_hypothesis_closest_to_target_tally(
+                target_hypothesis_idx = self.model.hypothesis_manager.find_hypothesis_closest_to_target_tally(
                     target_tally, self
                 )
 
