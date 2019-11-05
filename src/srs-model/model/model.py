@@ -1,8 +1,9 @@
 """Contains main simulation code for the SRS model."""
 
-from typing import List, Optional
+from typing import Optional
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler, RandomActivation
+from .hypotheses import create_hypothesis, HypothesisManager
 
 
 class Agent(MesaAgent):
@@ -111,6 +112,7 @@ class SrsModel(Model):
             magnitude.
         agent_map: A dictionary which has agent IDs as keys and the
             corresponding Agent instance as values.
+        hypothesis_manager: An instance of the hypothesis manager class.
         scheduler: A scheduler instance that determines in which order
             agents act.
     """
@@ -179,6 +181,9 @@ class SrsModel(Model):
 
         # Initialize agent map
         self.agent_map = {}
+
+        # Initialize hypothesis manager
+        self.hypothesis_manager = HypothesisManager()
 
     def initialize_agents(
         self,

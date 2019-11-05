@@ -1,10 +1,14 @@
 """Contains constants for SRS model."""
 
+# Hypothesis keys
+HYPOTHESIS_AUTHOR = "author"
+HYPOTHESIS_INITIAL_OUTCOME = "initial outcome"
+HYPOTHESIS_TALLY = "tally"
+HYPOTHESIS_TRUTH = "truth"
+
 # Result specifiers
 RESULT_POSITIVE = "positive"
 RESULT_NEGATIVE = "positive"
-RESULT_TRUE = "true"
-RESULT_FALSE = "true"
 
 # Investigation types
 TYPE_NOVEL = "novel"
