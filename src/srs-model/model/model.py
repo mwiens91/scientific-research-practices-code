@@ -4,7 +4,20 @@ from typing import Optional
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler, RandomActivation
 import life_cycle_helpers
-from .hypotheses import create_hypothesis, HypothesisManager
+from .constants import (
+    HYPOTHESIS_AUTHOR,
+    HYPOTHESIS_INITIAL_OUTCOME,
+    HYPOTHESIS_TALLY,
+    HYPOTHESIS_TRUTH,
+    INVESTIGATION_NOVEL,
+    INVESTIGATION_REPLICATION,
+    INVESTIGATION_RESULT,
+    INVESTIGATION_TARGET_HYPOTHESIS,
+    INVESTIGATION_TYPE,
+    RESULT_NEGATIVE,
+    RESULT_POSITIVE,
+)
+from .hypotheses import HypothesisManager
 
 
 class Agent(MesaAgent):
@@ -27,6 +40,8 @@ class Agent(MesaAgent):
             positive replication result.
         c_R_neg: The probability that the agent chooses to publish a
             negative replication result.
+        alpha: The agent's type I error.
+        beta: The agent's type I error.
         staged_investigation: An (optional) investigation the agent has
             staged.
     """
@@ -60,6 +75,10 @@ class Agent(MesaAgent):
         self.c_R_pos = c_R_pos
         self.c_R_neg = c_R_neg
 
+        # Determine the agent's type I and II errors
+        self.alpha = life_cycle_helpers.alpha(self.gamma, self.tau)
+        self.beta = life_cycle_helpers.beta(self.gamma)
+
         # Set the staged investigation
         self.staged_investigation = None
 
@@ -78,13 +97,100 @@ class Agent(MesaAgent):
         # We now branch depending on whether we have an investigation
         # staged
         if self.staged_investigation is None:
-            # Hypothesis Selection
+            # Hypothesis Selection. First determine whether to
+            # investigate a novel hypothesis or replicate an existiing
+            # hypothesis.
+            will_replicate = self.random.choices(
+                population=[True, False], weights=[self.r, 1 - self.r]
+            )[0]
+
+            # On the first few iterations of the simulation we need to
+            # account for there being no hypotheses to replicate. In
+            # this case, we force agents to investigate novel
+            # hypotheses.
+            if not self.model.hypothesis_manager.hypotheses:
+                will_replicate = False
+
+            # Now either choose a hypothesis to replicate, or choose a
+            # novel hypothesis
+            if will_replicate:
+                # Set the investigation type
+                investigation_type = INVESTIGATION_REPLICATION
+
+                # Select a target tally
+                target_tally = self.random.gauss(0, self.model.sigma_t)
+
+                # Select a random hypothesis closest to this tally
+                target_hypothesis_idx = self.model.find_hypothesis_closest_to_target_tally(
+                    target_tally, self
+                )
+
+                # Record truth of hypothesis
+                hypothesis_truth = self.model.hypotheses[
+                    target_hypothesis_idx
+                ][HYPOTHESIS_TRUTH]
+            else:
+                # Set the investigation type
+                investigation_type = INVESTIGATION_NOVEL
+
+                # Determine whether hypothesis selected is true or false
+                hypothesis_truth = self.random.choices(
+                    population=[True, False],
+                    weights=[self.model.b, 1 - self.model.b],
+                )[0]
 
             # Investigation
+            if hypothesis_truth:
+                investigation_result = self.random.choices(
+                    population=[RESULT_POSITIVE, RESULT_NEGATIVE],
+                    weights=[1 - self.beta, self.beta],
+                )[0]
+            else:
+                investigation_result = self.random.choices(
+                    population=[RESULT_POSITIVE, RESULT_NEGATIVE],
+                    weights=[self.alpha, 1 - self.alpha],
+                )[0]
 
             # Communication Decision
+            if investigation_type == INVESTIATION_NOVEL:
+                investigation_to_stage = {
+                    INVESTIGATION_TYPE: INVESTIGATION_NOVEL,
+                    INVESTIGATION_RESULT: investigation_result,
+                }
 
-            pass
+                if investigation_result == RESULT_POSITIVE:
+                    will_publish = self.random.choices(
+                        population=[True, False],
+                        weights=[self.c_N_pos, 1 - self.c_N_pos],
+                    )[0]
+                else:
+                    will_publish = self.random.choices(
+                        population=[True, False],
+                        weights=[self.c_N_neg, 1 - self.c_N_neg],
+                    )[0]
+
+                if will_publish:
+                    self.staged_investigation = investigation_to_stage
+            else:
+                investigation_to_stage = {
+                    INVESTIGATION_TYPE: INVESTIGATION_REPLICATION,
+                    INVESTIGATION_RESULT: investigation_result,
+                    INVESTIGATION_TARGET_HYPOTHESIS: target_hypothesis_idx,
+                }
+
+                if investigation_result == RESULT_POSITIVE:
+                    will_publish = self.random.choices(
+                        population=[True, False],
+                        weights=[self.c_R_pos, 1 - self.c_R_pos],
+                    )[0]
+                else:
+                    will_publish = self.random.choices(
+                        population=[True, False],
+                        weights=[self.c_R_neg, 1 - self.c_R_neg],
+                    )[0]
+
+                if will_publish:
+                    self.staged_investigation = investigation_to_stage
         else:
             # Communication
 

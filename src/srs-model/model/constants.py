@@ -8,8 +8,11 @@ HYPOTHESIS_TRUTH = "truth"
 
 # Result specifiers
 RESULT_POSITIVE = "positive"
-RESULT_NEGATIVE = "positive"
+RESULT_NEGATIVE = "negative"
 
-# Investigation types
-TYPE_NOVEL = "novel"
-TYPE_REPLICATION = "replication"
+# Investigation constants
+INVESTIGATION_TYPE = "type"
+INVESTIGATION_NOVEL = "novel"
+INVESTIGATION_REPLICATION = "replication"
+INVESTIGATION_RESULT = "result"
+INVESTIGATION_TARGET_HYPOTHESIS = "target"
