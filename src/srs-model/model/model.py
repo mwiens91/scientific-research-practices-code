@@ -145,6 +145,8 @@ class SrsModel(Model):
         scheduler: Optional[BaseScheduler] = RandomActivation,
     ) -> None:
         """Initialize the SRS model."""
+        super().__init__()
+
         # Set model parameters
         self.a = a
         self.d = d
@@ -174,6 +176,9 @@ class SrsModel(Model):
 
         # Set model scheduler
         self.scheduler = scheduler(self)
+
+        # Initialize agent map
+        self.agent_map = {}
 
     def initialize_agents(
         self,
@@ -208,19 +213,23 @@ class SrsModel(Model):
                 negative replication result.
         """
         for _ in range(self.a):
-            self.scheduler.add(
-                Agent(
-                    unique_id=self.next_id(),
-                    model=self,
-                    gamma=gamma,
-                    tau=tau,
-                    r=r,
-                    c_N_pos=c_N_pos,
-                    c_N_neg=c_N_neg,
-                    c_R_pos=c_R_pos,
-                    c_R_neg=c_R_neg,
-                )
+            # Create an agent
+            _id = self.next_id()
+            agent = Agent(
+                unique_id=_id,
+                model=self,
+                gamma=gamma,
+                tau=tau,
+                r=r,
+                c_N_pos=c_N_pos,
+                c_N_neg=c_N_neg,
+                c_R_pos=c_R_pos,
+                c_R_neg=c_R_neg,
             )
+
+            # Add agent to scheduler and agent map
+            self.scheduler.add(agent)
+            self.agent_map[_id] = agent
 
     def step(self) -> None:
         """Iterate through all agent actions for one time step."""
