@@ -229,6 +229,9 @@ class Agent(MesaAgent):
             # Unstage the investigation
             self.staged_investigation = None
 
+        # Finally, increment the agent's age
+        self.y += 1
+
 
 class SrsModel(Model):
     """The simulated SRS model.
