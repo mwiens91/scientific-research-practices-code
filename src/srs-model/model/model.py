@@ -504,6 +504,87 @@ class SrsModel(Model):
         # Clear the published investigations list for the next time step
         self.published_investigations = []
 
-        # Perform the Expansion stage
+        # Perform the Expansion stage. First randomly sample d agents
+        # from the population.
+        sample_ids = self.random.sample(list(self.agent_map.keys()), self.d)
 
-        # Perform the Retirement stage
+        # Filter these IDs by highest reputation, then highest age
+        highest_reputation = max([self.agent_map[_id].w for _id in sample_ids])
+        sample_ids = [
+            _id
+            for _id in sample_ids
+            if self.agent_map[_id].w == highest_reputation
+        ]
+
+        highest_age = max([self.agent_map[_id].y for _id in sample_ids])
+        sample_ids = [
+            _id for _id in sample_ids if self.agent_map[_id].y == highest_age
+        ]
+
+        # Select an agent
+        selected_id = self.random.choice(sample_ids)
+
+        # Create a new agent
+        parent_agent = self.agent_map[selected_id]
+
+        child_agent_id = self.next_id()
+
+        # Determine research stategy parameters for child agent
+        gamma_c = life_cycle_helpers.phi(
+            self.random.gauss(parent_agent.gamma, self.sigma_gamma)
+        )
+        tau_c = max(self.random.gauss(parent_agent.tau, self.sigma_tau), 0)
+        r_c = life_cycle_helpers.phi(
+            self.random.gauss(parent_agent.r, self.sigma_r)
+        )
+        c_N_pos_c = life_cycle_helpers.phi(
+            self.random.gauss(parent_agent.c_N_pos, self.sigma_c_N_pos)
+        )
+        c_N_neg_c = life_cycle_helpers.phi(
+            self.random.gauss(parent_agent.c_N_neg, self.sigma_c_N_neg)
+        )
+        c_R_pos_c = life_cycle_helpers.phi(
+            self.random.gauss(parent_agent.c_R_pos, self.sigma_c_R_pos)
+        )
+        c_R_neg_c = life_cycle_helpers.phi(
+            self.random.gauss(parent_agent.c_R_neg, self.sigma_c_R_neg)
+        )
+
+        child_agent = Agent(
+            child_agent_id,
+            self,
+            gamma_c,
+            tau_c,
+            r_c,
+            c_N_pos_c,
+            c_N_neg_c,
+            c_R_pos_c,
+            c_R_neg_c,
+        )
+
+        # Add in the agent
+        self.scheduler.add(child_agent)
+        self.agent_map[child_agent_id] = child_agent
+
+        # Perform the Retirement stage First randomly sample d agents
+        # from the population.
+        sample_ids = self.random.sample(list(self.agent_map.keys()), self.d)
+
+        # Filter these IDs by highest age, then lowest reputation
+        highest_age = max([self.agent_map[_id].y for _id in sample_ids])
+        sample_ids = [
+            _id for _id in sample_ids if self.agent_map[_id].y == highest_age
+        ]
+
+        lowest_reputation = min([self.agent_map[_id].w for _id in sample_ids])
+        sample_ids = [
+            _id
+            for _id in sample_ids
+            if self.agent_map[_id].w == lowest_reputation
+        ]
+
+        # Select and remove an agent
+        selected_id = self.random.choice(sample_ids)
+
+        self.scheduler.remove(self.agent_map[selected_id])
+        del self.agent_map[selected_id]
