@@ -447,17 +447,21 @@ class SrsModel(Model):
 
                 # Determine whether the investigation was consistent
                 # with the original investigation outcome of the
-                # hypothesis. Here we assign the tally change and payoff
-                # variables relevant to this result.
+                # hypothesis. Here we assign payoff constant for the
+                # original author.
                 if (
                     investigation_result
                     == target_hypothesis[HYPOTHESIS_INITIAL_OUTCOME]
                 ):
-                    ds = 1
                     v_RX = self.v_RS
                 else:
-                    ds = -1
                     v_RX = self.v_RF
+
+                # Determine tally change
+                if investigation_result == RESULT_POSITIVE:
+                    ds = 1
+                else:
+                    ds = -1
 
                 # Keep track of which tallies we need to change, which
                 # we will do after assigning payoffs
@@ -497,12 +501,12 @@ class SrsModel(Model):
                 else:
                     self.agent_map[investigation_author_id].w += self.v_N_neg
 
+        # Clear the published investigations list for the next time step
+        self.published_investigations = []
+
         # Now change tallies of hypotheses
         for hyp_idx, ds in tally_change_map.items():
             self.hypothesis_manager.hypotheses[hyp_idx][HYPOTHESIS_TALLY] += ds
-
-        # Clear the published investigations list for the next time step
-        self.published_investigations = []
 
         # Perform the Expansion stage. First randomly sample d agents
         # from the population.
