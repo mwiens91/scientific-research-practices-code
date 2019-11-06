@@ -269,6 +269,9 @@ class SrsModel(Model):
         eta_R_neg: Influence of reputation on publishing negative
             replication results.
         sigma_t: Standard deviation for targeted tally replication.
+        sigma_gamma: Standard deviation for gamma mutation magnitude.
+        sigma_tau: Standard deviation for tau mutation magnitude.
+        sigma_r: Standard deviation for r mutation magnitude.
         sigma_c_N_pos: Standard deviation for c_N_pos mutation
             magnitude.
         sigma_c_N_neg: Standard deviation for c_N_neg mutation
@@ -309,6 +312,9 @@ class SrsModel(Model):
         eta_R_pos: float,
         eta_R_neg: float,
         sigma_t: float,
+        sigma_gamma: float,
+        sigma_tau: float,
+        sigma_r: float,
         sigma_c_N_pos: float,
         sigma_c_N_neg: float,
         sigma_c_R_pos: float,
@@ -340,6 +346,9 @@ class SrsModel(Model):
         self.eta_R_pos = eta_R_pos
         self.eta_R_neg = eta_R_neg
         self.sigma_t = sigma_t
+        self.sigma_gamma = sigma_gamma
+        self.sigma_tau = sigma_tau
+        self.sigma_r = sigma_r
         self.sigma_c_N_pos = sigma_c_N_pos
         self.sigma_c_N_neg = sigma_c_N_neg
         self.sigma_c_R_pos = sigma_c_R_pos
