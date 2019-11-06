@@ -263,14 +263,6 @@ class SrsModel(Model):
         eta_s: Influence of rigour on Productivity Checks.
         eta_r: Influence of tallies on replication payoffs.
         eta_j: Influence of reputation on publication probabilities.
-        eta_N_pos: Influence of reputation on publishing positive novel
-            results.
-        eta_N_neg: Influence of reputation on publishing negative novel
-            results.
-        eta_R_pos: Influence of reputation on publishing positive
-            replication results.
-        eta_R_neg: Influence of reputation on publishing negative
-            replication results.
         sigma_t: Standard deviation for targeted tally replication.
         sigma_gamma: Standard deviation for gamma mutation magnitude.
         sigma_tau: Standard deviation for tau mutation magnitude.
@@ -310,10 +302,6 @@ class SrsModel(Model):
         eta_s: float,
         eta_r: float,
         eta_j: float,
-        eta_N_pos: float,
-        eta_N_neg: float,
-        eta_R_pos: float,
-        eta_R_neg: float,
         sigma_t: float,
         sigma_gamma: float,
         sigma_tau: float,
@@ -344,10 +332,6 @@ class SrsModel(Model):
         self.eta_s = eta_s
         self.eta_r = eta_r
         self.eta_j = eta_j
-        self.eta_N_pos = eta_N_pos
-        self.eta_N_neg = eta_N_neg
-        self.eta_R_pos = eta_R_pos
-        self.eta_R_neg = eta_R_neg
         self.sigma_t = sigma_t
         self.sigma_gamma = sigma_gamma
         self.sigma_tau = sigma_tau
