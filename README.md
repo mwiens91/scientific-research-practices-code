@@ -3,7 +3,8 @@
 
 This repository contains [Jupyter](https://jupyter.org/) notebooks and
 [Mesa](https://github.com/projectmesa/mesa) models used in the research
-for my undergraduate math thesis.
+for my undergraduate math thesis "Why Are Poor Scientific Research
+Practices So Prevalent? An Evolutionary Approach.".
 
 Models and notebooks are included in [`src`](src). To install
 requirements needed to run code from this repositiory, first create a
