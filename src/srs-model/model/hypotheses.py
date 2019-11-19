@@ -14,8 +14,6 @@ from .constants import (
 class HypothesisManager:
     """A class to manage hypotheses.
 
-    Each hypothesis' attributes are tracked by four arrays.
-
     Attributes:
         hypotheses: An array consisting of hypotheses.
         hypothesis_map: A dictionary which has tallies as keys and
