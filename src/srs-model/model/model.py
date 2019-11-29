@@ -120,7 +120,9 @@ class Agent(MesaAgent):
                 investigation_type = INVESTIGATION_REPLICATION
 
                 # Select a target tally
-                target_tally = self.random.gauss(0, self.model.sigma_t)
+                target_tally = self.random.gauss(
+                    self.model.mu_t, self.model.sigma_t
+                )
 
                 # Select a random hypothesis closest to this tally
                 target_hypothesis_idx = self.model.hypothesis_manager.find_hypothesis_closest_to_target_tally(
@@ -263,6 +265,7 @@ class SrsModel(Model):
         eta_s: Influence of rigour on Productivity Checks.
         eta_r: Influence of tallies on replication payoffs.
         eta_j: Influence of reputation on publication probabilities.
+        mu_t: Mean for targeted tally replication.
         sigma_t: Standard deviation for targeted tally replication.
         sigma_gamma: Standard deviation for gamma mutation magnitude.
         sigma_tau: Standard deviation for tau mutation magnitude.
@@ -302,6 +305,7 @@ class SrsModel(Model):
         eta_s: float,
         eta_r: float,
         eta_j: float,
+        mu_t: float,
         sigma_t: float,
         sigma_gamma: float,
         sigma_tau: float,
@@ -332,6 +336,7 @@ class SrsModel(Model):
         self.eta_s = eta_s
         self.eta_r = eta_r
         self.eta_j = eta_j
+        self.mu_t = mu_t
         self.sigma_t = sigma_t
         self.sigma_gamma = sigma_gamma
         self.sigma_tau = sigma_tau
