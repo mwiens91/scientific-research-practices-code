@@ -1,5 +1,6 @@
 """Contains main simulation code for the SRS model."""
 
+import sys
 from typing import Optional
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler, RandomActivation
@@ -529,7 +530,10 @@ class SrsModel(Model):
         gamma_c = life_cycle_helpers.phi(
             self.random.gauss(parent_agent.gamma, self.sigma_gamma)
         )
-        tau_c = max(self.random.gauss(parent_agent.tau, self.sigma_tau), 0)
+        tau_c = max(
+            self.random.gauss(parent_agent.tau, self.sigma_tau),
+            sys.float_info.epsilon,
+        )
         r_c = life_cycle_helpers.phi(
             self.random.gauss(parent_agent.r, self.sigma_r)
         )
